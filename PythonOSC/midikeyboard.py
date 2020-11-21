@@ -20,15 +20,15 @@ class Midikeyboard:
             self.dic_ascii[n] = i        
 
     #Take an Ascii key as an input and returns the Midi input value.
-    def KeyToMidi(self,key: int) -> int:
+    def KeyToMidi(self,key: int) -> list:
         if key in self.dic_ascii:
-            return self.dic_ascii[key] + self.octave
+            return [self.dic_ascii[key] + self.octave,127]
         else:
             return None
 
 obj = Midikeyboard()
 obj.MapAsciiToNotes(",;.lkmjnhbg")
-obj.set_octave(ord('+'))
-obj.set_octave(ord('-'))
+obj.SetOctave(ord('+'))
+obj.SetOctave(ord('-'))
 
 print(obj.KeyToMidi(ord(",")))
