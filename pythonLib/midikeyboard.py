@@ -32,7 +32,7 @@ class Midikeyboard:
                 return [self.dic_ascii[key] + self.octave,127]
             else:
                 return [abs(127 - (self.dic_ascii[key]+self.octave)),127]
-        #ord('+') = 43 and #ord('-') = 45
+        #ord('+') = 43 and #ord('-') = 45p
         elif key == 43 or key == 45: 
             self.SetOctave(key)
         #ord('*') = 42

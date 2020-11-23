@@ -20,7 +20,7 @@ def midi_keyOn(address, *args):
     client_out.send_message("/outputs/key", out)
 
 
-def midi_keyOff(address, *args):
+def midi_keyOff(address, *args): 
     # make the MIDI output to be sent
     out = [args[0],0]
     # send the MIDI output
