@@ -29,9 +29,9 @@ class Midikeyboard:
         
         if key in self.dic_ascii:
             if self.transpose>0:
-                return [self.dic_ascii[key] + self.octave,127]
+                return self.dic_ascii[key] + self.octave
             else:
-                return [abs(127 - (self.dic_ascii[key]+self.octave)),127]
+                return abs(127 - (self.dic_ascii[key]+self.octave))
         #ord('+') = 43 and #ord('-') = 45p
         elif key == 43 or key == 45: 
             self.SetOctave(key)
@@ -41,10 +41,5 @@ class Midikeyboard:
         else:
             return None         
 
-obj = Midikeyboard()
-obj.MapAsciiToNotes(",;.lkmjnhbg")
-print(obj.KeyToMidi(ord(",")))
-print(obj.KeyToMidi(ord("*")))
-print(obj.KeyToMidi(ord(",")))
 
 
