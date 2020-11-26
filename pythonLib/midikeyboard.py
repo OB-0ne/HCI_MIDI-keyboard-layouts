@@ -4,8 +4,8 @@ class midiKeyboard:
         self.octave = {}
         self.dic_ascii = {}
         self.trans = {}
-        self.oct = 0
-        self.transpose = 1
+        self.oct = 48
+        self.transpose = 0
         self.onOrOff = 127
 
     def setTransposeKey(self,   string: str) -> None:
@@ -17,19 +17,13 @@ class midiKeyboard:
         self.octave = {}
         self.octave[ord(string[0])] = 'oct_inc'
         self.octave[ord(string[1])] = 'oct_dec'
-    
+
     #Take sequence of characters and update the notes mapping (from 0 to 11)  
     def setNotesKeys(self,  string: str) -> None:
         ascii_list = [ord(s) for s in string]
         self.dic_ascii = {}
         for i,n in enumerate(ascii_list):
-            self.dic_ascii[n] = i   
-        
-    def setOnOrOff(self,    string: str) -> None:
-        if string == "key_on":
-            self.onOrOff = 127
-        if string == "key_off":
-            self.onOrOff = 0   
+            self.dic_ascii[n] = i    
        
     #Take the  ASCII value for the keys:('+','-') and update the octet by +12 or -12, respectively
     #And, rotate the value once it crosses the limit: [0,127]
@@ -48,6 +42,22 @@ class midiKeyboard:
 
     #Take an Ascii key as an input and returns the Midi input value.
     def keyToMidi(self, key: int, noteStatus: str) -> list:
-        return [self.dic_ascii[key] + self.oct + self.transpose]
+        
+        midi_key = (self.dic_ascii[key] + self.oct + self.transpose) % 128
+        
+        if noteStatus == "on":
+            vol = 127
+        if noteStatus == "off":
+            vol = 0   
 
-
+        return [midi_key, vol]
+  
+    def checkKeyAndCallFunction(self, key, key_status='off'):
+        if key in self.octave:
+            self.updateOctave(self.octave[key])
+        elif key in self.trans:
+            self.updateTranspose(self.trans[key])
+        elif key in self.dic_ascii:
+            return self.keyToMidi(key, key_status)
+        else:
+            return None
