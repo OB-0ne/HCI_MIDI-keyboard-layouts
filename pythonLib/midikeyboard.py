@@ -6,17 +6,14 @@ class midiKeyboard:
         self.trans = {}
         self.oct = 48
         self.transpose = 0
-        self.onOrOff = 127
 
-    def setTransposeKey(self,   string: str) -> None:
+    def setTransposeKey(self,   key: str) -> None:
         self.trans = {}
-        self.trans[ord(string[0])] = 'trans_inc'
-        self.trans[ord(string[1])] = 'trans_dec'
+        self.trans[ord(key)] = 'trans_inc'
 
-    def setOctaveKey(self,  string: str) -> None:
+    def setOctaveKey(self,  key: str) -> None:
         self.octave = {}
-        self.octave[ord(string[0])] = 'oct_inc'
-        self.octave[ord(string[1])] = 'oct_dec'
+        self.octave[ord(key)] = 'oct_inc'
 
     #Take sequence of characters and update the notes mapping (from 0 to 11)  
     def setNotesKeys(self,  string: str) -> None:
@@ -27,17 +24,18 @@ class midiKeyboard:
        
     #Take the  ASCII value for the keys:('+','-') and update the octet by +12 or -12, respectively
     #And, rotate the value once it crosses the limit: [0,127]
-    def updateOctave(self,  string: str) -> None:        
-        if string == "oct_inc":
-            self.oct = self.oct + 12 if self.oct<116 else 0
-        else:
-            self.oct = self.oct - 12 if self.oct>11 else 116  
+    def updateOctave(self, second_key: int) -> None:
+        if second_key == 0:
+            self.oct += 12
+        elif second_key == 512:
+            self.oct -= 12
+        self.oct = self.oct % 128 
 
     ##***Put condition for overall self.dic_ascii[n] + self.oct + self.transpose value exceeding 127 or become negative.***
-    def updateTranspose(self,   string: str) -> None:
-        if string == "trans_inc":
+    def updateTranspose(self, second_key: int) -> None:
+        if second_key == 0:
             self.transpose += 1
-        else:
+        elif second_key == 512:
             self.transpose -= 1     
 
     #Take an Ascii key as an input and returns the Midi input value.
@@ -52,11 +50,11 @@ class midiKeyboard:
 
         return [midi_key, vol]
   
-    def checkKeyAndCallFunction(self, key, key_status='off'):
-        if key in self.octave:
-            self.updateOctave(self.octave[key])
-        elif key in self.trans:
-            self.updateTranspose(self.trans[key])
+    def checkKeyAndCallFunction(self, key, second_key='0', key_status='off'):
+        if (key in self.octave and key_status=='on'):
+            self.updateOctave(second_key)
+        elif (key in self.trans and key_status=='on'):
+            self.updateTranspose(second_key)
         elif key in self.dic_ascii:
             return self.keyToMidi(key, key_status)
         else:
