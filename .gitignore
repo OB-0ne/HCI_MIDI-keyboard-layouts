@@ -2,3 +2,5 @@
 /pythonLib/__pycache__
 /.vscode
 /old stuff
+/pythonLib/mouse_check.py
+/pythonLib/mouse_pygui.py

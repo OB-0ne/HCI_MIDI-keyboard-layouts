@@ -17,6 +17,10 @@ def set_keyMappings(address, *args):
         keyboard1.setOctaveKey(args[0])
     elif address.split('/')[-1] == 'transpose':
         keyboard1.setTransposeKey(args[0])
+    elif address.split('/')[-1] == 'pitch':
+        keyboard1.setPitchKey(args[0])
+    elif address.split('/')[-1] == 'modulation':
+        keyboard1.setModulationKey(args[0])
 
 def keyOn(address, *args):
     # make the MIDI output to be sent
