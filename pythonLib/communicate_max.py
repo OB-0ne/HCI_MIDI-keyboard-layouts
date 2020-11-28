@@ -12,11 +12,14 @@ def default_handler(address, *args):
 
 def set_keyMappings(address, *args):
     if address.split('/')[-1] == 'keyboard':
-        keyboard1.setNotesKeys(args[0])
+        out = keyboard1.setNotesKeys(args[0])
+        client_out.send_message("/outputs/key_mappings_spaced", out)
     elif address.split('/')[-1] == 'octave':
-        keyboard1.setOctaveKey(args[0])
+        out = keyboard1.setOctaveKey(args[0])
+        client_out.send_message("/outputs/transpose", out)
     elif address.split('/')[-1] == 'transpose':
-        keyboard1.setTransposeKey(args[0])
+        out = keyboard1.setTransposeKey(args[0])
+        client_out.send_message("/outputs/octave", out)
     elif address.split('/')[-1] == 'pitch_bend':
         keyboard1.setPitchKey(args[0])
     elif address.split('/')[-1] == 'modulation':
@@ -26,22 +29,22 @@ def keyOn(address, *args):
     # make the MIDI output to be sent
     out = keyboard1.checkKeyAndCallFunction(args[0], second_key=args[1], key_status='on')
     # send the MIDI output
-    if type(out)==int:
-        print('here')
-        client_out.send_message("/outputs/pitch_bend", out)
-    else:
-        client_out.send_message("/outputs/key", out)
+    if out:
+        if len(out)>1:
+            client_out.send_message("/outputs/" + out[0], out[1])
+        else:
+            client_out.send_message("/outputs/key", out[0])
 
 
 def keyOff(address, *args): 
     # make the MIDI output to be sent
     out = keyboard1.checkKeyAndCallFunction(args[0], second_key=args[1], key_status='off')
     # send the MIDI output
-    if type(out)==int:
-        print('here')
-        client_out.send_message("/outputs/pitch_bend", out)
-    else:
-        client_out.send_message("/outputs/key", out)
+    if out:
+        if len(out)>1:
+            client_out.send_message("/outputs/" + out[0], out[1])
+        else:
+            client_out.send_message("/outputs/key", out[0])
 
 # setup the needed keyboards
 keyboard1 = midiKeyboard()

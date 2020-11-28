@@ -18,9 +18,13 @@ class midiKeyboard:
         self.trans = {}
         self.trans[ord(str(key))] = 'trans_inc'
 
+        return self.transpose
+
     def setOctaveKey(self,  key: str) -> None:
         self.octave = {}
         self.octave[ord(str(key))] = 'oct_inc'
+
+        return "C"+str(int(self.oct/12)-1)
 
     #Take sequence of characters and update the notes mapping (from 0 to 11)  
     def setNotesKeys(self,  string: str) -> None:
@@ -28,6 +32,8 @@ class midiKeyboard:
         self.dic_ascii = {}
         for i,n in enumerate(ascii_list):
             self.dic_ascii[n] = i  
+
+        return [str(x) for x in string]
 
     def setPitchKey(self, key: str) -> None:
         self.pitch = {}
@@ -46,12 +52,16 @@ class midiKeyboard:
             self.oct -= 12
         self.oct = self.oct % 128 
 
+        return ['octave','C'+str(int(self.oct/12)-1)]
+
     ##***Put condition for overall self.dic_ascii[n] + self.oct + self.transpose value exceeding 127 or become negative.***
     def updateTranspose(self, second_key: int) -> None:
         if second_key == 0:
             self.transpose += 1
         elif second_key == 512:
             self.transpose -= 1 
+
+        return ['transpose',self.transpose]
 
     def updatePitch(self, key_status: str) -> int:
         change = 50
@@ -69,7 +79,7 @@ class midiKeyboard:
                 self.pit -=change
             elif self.pit<64:
                 self.pit +=change
-        return self.pit   
+        return ['pitch_bend',self.pit]
 
     def updateModulation(self,key_status: str) -> int:
         if key_status == 'on':
@@ -84,7 +94,7 @@ class midiKeyboard:
             self.modu = 0
         elif self.modu>127:
             self.modu = 127
-        return self.modu 
+        return ['modulation',self.modu]
 
     #Take an Ascii key as an input and returns the Midi input value.
     def keyToMidi(self, key: int, noteStatus: str) -> list:        
@@ -93,13 +103,13 @@ class midiKeyboard:
             vol = 127
         if noteStatus == "off":
             vol = 0   
-        return [midi_key, vol]
+        return [[midi_key, vol]]
   
     def checkKeyAndCallFunction(self, key, second_key='0', key_status='off'):
         if (key in self.octave and key_status=='on'):
-            self.updateOctave(second_key)
+            return self.updateOctave(second_key)
         elif (key in self.trans and key_status=='on'):
-            self.updateTranspose(second_key)
+            return self.updateTranspose(second_key)
         elif (key in self.pitch):
             return self.updatePitch(key_status)
         elif (key in self.modulation):
