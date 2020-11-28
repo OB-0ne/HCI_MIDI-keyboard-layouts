@@ -7,5 +7,5 @@ Run the python communicator
 > python pythonLib/communicate_max.py
 
 How to:
-- Run the following file in Max/MSP -> MIDI Controller v0.04
+- Run the following file in Max/MSP -> MIDI Controller v0.05
 - the current set keys for the keyboard, octave and transpose are displayed

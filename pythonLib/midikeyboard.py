@@ -16,11 +16,11 @@ class midiKeyboard:
 
     def setTransposeKey(self,   key: str) -> None:
         self.trans = {}
-        self.trans[ord(key)] = 'trans_inc'
+        self.trans[ord(str(key))] = 'trans_inc'
 
     def setOctaveKey(self,  key: str) -> None:
         self.octave = {}
-        self.octave[ord(key)] = 'oct_inc'
+        self.octave[ord(str(key))] = 'oct_inc'
 
     #Take sequence of characters and update the notes mapping (from 0 to 11)  
     def setNotesKeys(self,  string: str) -> None:
@@ -31,11 +31,11 @@ class midiKeyboard:
 
     def setPitchKey(self, key: str) -> None:
         self.pitch = {}
-        self.pitch[ord(key)] = 'pitch_inc'  
+        self.pitch[ord(str(key))] = 'pitch_inc'  
 
     def setModulationKey(self, key: str) -> None:
         self.modulation = {}
-        self.modulation[ord(key)] = 'modu_inc'
+        self.modulation[ord(str(key))] = 'modu_inc'
        
     #Take the  ASCII value for the keys:('+','-') and update the octet by +12 or -12, respectively
     #And, rotate the value once it crosses the limit: [0,127]
@@ -54,20 +54,21 @@ class midiKeyboard:
             self.transpose -= 1 
 
     def updatePitch(self, key_status: str) -> int:
+        change = 50
         if key_status == 'on':
             if self.pit>0 and self.pit<127:
                 new = py.position().y
                 diff = self.old- new
                 if diff >0:
-                    self.pit +=1
+                    self.pit +=change
                 elif diff <0:
-                    self.pit -=1
+                    self.pit -=change
                 self.old = new
         elif key_status == 'off':
             if self.pit>64:
-                self.pit -=1
+                self.pit -=change
             elif self.pit<64:
-                self.pit +=1
+                self.pit +=change
         return self.pit   
 
     def updateModulation(self,key_status: str) -> int:
@@ -102,6 +103,7 @@ class midiKeyboard:
         elif (key in self.pitch):
             return self.updatePitch(key_status)
         elif (key in self.modulation):
+            print(self.updateModulation(key_status))
             return self.updateModulation(key_status)
         elif key in self.dic_ascii:
             return self.keyToMidi(key, key_status)
