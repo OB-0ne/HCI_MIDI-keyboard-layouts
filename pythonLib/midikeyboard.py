@@ -18,6 +18,7 @@ class midiKeyboard:
         self.pit = 64
         self.old = 0
         self.modu = 0
+        self.gen_MIDI_flag = False
 
     def setTransposeKey(self,   key: str) -> None:
         self.trans = {}
@@ -111,17 +112,26 @@ class midiKeyboard:
         return [[midi_key, vol]]
 
     def send_genMIDI(self, ip, port):
+
+        self.gen_MIDI_flag = True
         client = SimpleUDPClient(ip, port)
-        sample_no = random.randint(1,5)
+
+        sample_no = random.randint(21,30)
         mid = mido.MidiFile('gen_midi_samples/sample_' + str(sample_no) + '.mid')
         for msg in mid.play():
-            if msg.type == 'note_on':
-                client.send_message("/outputs/gen_MIDI",[msg.note, msg.velocity])
-            elif msg.type == 'note_off':
-                client.send_message("/outputs/gen_MIDI",[msg.note, 0])
+            if self.gen_MIDI_flag:
+                if msg.type == 'note_on':
+                    client.send_message("/outputs/gen_MIDI",[msg.note, msg.velocity])
+                elif msg.type == 'note_off':
+                    client.send_message("/outputs/gen_MIDI",[msg.note, 0])
         for i in range(128):
             client.send_message("/outputs/gen_MIDI",[i, 0])
         return None
+
+    def stop_genMIDI(self):
+        self.gen_MIDI_flag = False
+        return None
+
   
     def checkKeyAndCallFunction(self, key, second_key='0', key_status='off'):
         if (key in self.octave and key_status=='on'):

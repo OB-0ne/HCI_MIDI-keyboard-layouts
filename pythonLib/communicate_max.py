@@ -49,6 +49,8 @@ def keyOff(address, *args):
 def set_genMIDI(address, *args):
     if args[0]==1:
         keyboard1.send_genMIDI(ip, port_out)
+    else:
+        keyboard1.stop_genMIDI()
 
 # setup the needed keyboards
 keyboard1 = midiKeyboard()
