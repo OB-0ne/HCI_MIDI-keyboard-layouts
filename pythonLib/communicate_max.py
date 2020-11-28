@@ -46,6 +46,10 @@ def keyOff(address, *args):
         else:
             client_out.send_message("/outputs/key", out[0])
 
+def set_genMIDI(address, *args):
+    if args[0]==1:
+        keyboard1.send_genMIDI(ip, port_out)
+
 # setup the needed keyboards
 keyboard1 = midiKeyboard()
 
@@ -62,6 +66,7 @@ client_out = SimpleUDPClient(ip, port_out)
 # setting the object which receives the messages and decides where to send them
 dispatcher = Dispatcher()
 dispatcher.map("/inputs/key_mapping/*", set_keyMappings)
+dispatcher.map("/inputs/key_on/gen_MIDI", set_genMIDI)
 dispatcher.map("/inputs/key_on", keyOn)
 dispatcher.map("/inputs/key_off", keyOff)
 dispatcher.set_default_handler(default_handler)
