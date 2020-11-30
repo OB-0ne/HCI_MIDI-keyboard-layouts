@@ -4,3 +4,7 @@
 /old stuff
 /pythonLib/mouse_check.py
 /pythonLib/mouse_pygui.py
+log.txt
+pythonLib/dummy_communicate_max.py
+pythonLib/dummy_midikeyboard.py
+pythonLib/keyboard_check.py

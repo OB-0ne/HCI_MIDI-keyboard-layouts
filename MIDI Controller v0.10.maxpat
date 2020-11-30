@@ -21,7 +21,7 @@
 		"gridsnaponopen" : 1,
 		"objectsnaponopen" : 1,
 		"statusbarvisible" : 2,
-		"toolbarvisible" : 1,
+		"toolbarvisible" : 0,
 		"lefttoolbarpinned" : 0,
 		"toptoolbarpinned" : 0,
 		"righttoolbarpinned" : 0,
@@ -29,8 +29,8 @@
 		"toolbars_unpinned_last_save" : 0,
 		"tallnewobj" : 0,
 		"boxanimatetime" : 200,
-		"enablehscroll" : 1,
-		"enablevscroll" : 1,
+		"enablehscroll" : 0,
+		"enablevscroll" : 0,
 		"devicewidth" : 0.0,
 		"description" : "",
 		"digest" : "",
@@ -60,7 +60,7 @@
 					"patching_rect" : [ 1570.0, 519.0, 93.804153323173523, 22.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 371.837031304836273, 84.862585663795471, 113.0, 22.0 ],
-					"text" : "Drum",
+					"text" : "Music box",
 					"textjustification" : 1
 				}
 
@@ -1818,7 +1818,7 @@
 					"presentation" : 1,
 					"presentation_rect" : [ 709.305087149143219, 55.813560307025909, 50.0, 22.0 ],
 					"style" : "velvet",
-					"text" : "C3",
+					"text" : "C4",
 					"textjustification" : 1
 				}
 
@@ -2315,12 +2315,13 @@
 , 							{
 								"box" : 								{
 									"id" : "obj-4",
+									"linecount" : 2,
 									"maxclass" : "message",
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 314.0, 98.0, 29.5, 22.0 ],
-									"text" : "1"
+									"text" : "bang"
 								}
 
 							}
@@ -2798,7 +2799,7 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 217.5, 141.0, 50.0, 36.0 ],
-									"text" : "51 0"
+									"text" : "116 0"
 								}
 
 							}
@@ -3513,7 +3514,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-7", 1 ],
-					"midpoints" : [ 1042.5, 558.0, 77.166666666666671, 558.0 ],
+					"midpoints" : [ 1042.5, 558.0, 71.75, 558.0 ],
 					"source" : [ "obj-43", 0 ]
 				}
 
@@ -3521,7 +3522,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-7", 2 ],
-					"midpoints" : [ 1103.5, 539.0, 98.833333333333343, 539.0 ],
+					"midpoints" : [ 1103.5, 539.0, 88.0, 539.0 ],
 					"source" : [ "obj-46", 0 ]
 				}
 

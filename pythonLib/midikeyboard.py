@@ -4,6 +4,9 @@ import time
 import random
 import mido
 
+from pynput.keyboard import Key, Listener, KeyCode
+
+
 
 class midiKeyboard:
 
@@ -19,6 +22,12 @@ class midiKeyboard:
         self.old = 0
         self.modu = 0
         self.gen_MIDI_flag = False
+        self.releaseFlagPitch = True
+        self.releaseFlagModu = True
+
+    def setIpPort(self,ip, port):
+        self.client_ip = ip
+        self.client_port = port
 
     def setTransposeKey(self,   key: str) -> None:
         self.trans = {}
@@ -70,7 +79,7 @@ class midiKeyboard:
         return ['transpose',self.transpose]
 
     def updatePitch(self, key_status: str) -> int:
-        change = 50
+        change = 5
         if key_status == 'on':
             if self.pit>0 and self.pit<127:
                 new = py.position().y
@@ -81,20 +90,18 @@ class midiKeyboard:
                     self.pit -=change
                 self.old = new
         elif key_status == 'off':
-            if self.pit>64:
-                self.pit -=change
-            elif self.pit<64:
-                self.pit +=change
+            self.pit = 64
         return ['pitch_bend',self.pit]
 
     def updateModulation(self,key_status: str) -> int:
+        change = 5
         if key_status == 'on':
             new = py.position().y
             diff = self.old- new
             if diff >0:
-                self.modu +=1
+                self.modu +=change
             elif diff <0:
-                self.modu -=1
+                self.modu -=change
             self.old = new
         if self.modu<0:
             self.modu = 0
@@ -132,6 +139,34 @@ class midiKeyboard:
         self.gen_MIDI_flag = False
         return None
 
+    def on_press(self,key):
+        client = SimpleUDPClient(self.client_ip, self.client_port)
+        if key == (KeyCode.from_char(chr(list(self.pitch.keys())[0]))):
+            out = self.updatePitch(key_status='on')
+            client.send_message("/outputs/" + out[0], out[1])  
+        elif key == (KeyCode.from_char(chr(list(self.modulation.keys())[0]))):
+            out = self.updateModulation(key_status='on')
+            client.send_message("/outputs/" + out[0], out[1])  
+            
+    def on_release(self,key):
+        if key == (KeyCode.from_char(chr(list(self.pitch.keys())[0]))):
+            self.releaseFlagPitch = True
+            return False
+        elif key == (KeyCode.from_char(chr(list(self.modulation.keys())[0]))):
+            self.releaseFlagModu = True
+            return False
+
+    def listenerKB(self):  
+        with Listener(on_press=self.on_press, on_release=self.on_release):
+            while not self.releaseFlagPitch:
+                self.releaseFlagPitch = True
+                time.sleep(5)
+                pass
+            while not self.releaseFlagModu:
+                self.releaseFlagModu = True
+                time.sleep(5)
+                pass
+ 
   
     def checkKeyAndCallFunction(self, key, second_key='0', key_status='off'):
         if (key in self.octave and key_status=='on'):
@@ -139,10 +174,17 @@ class midiKeyboard:
         elif (key in self.trans and key_status=='on'):
             return self.updateTranspose(second_key)
         elif (key in self.pitch):
-            return self.updatePitch(key_status)
+            if key_status == "on":
+                self.releaseFlagPitch = False
+                self.listenerKB()
+            else:
+                return self.updatePitch(key_status)
         elif (key in self.modulation):
-            print(self.updateModulation(key_status))
-            return self.updateModulation(key_status)
+            if key_status == "on":
+                self.releaseFlagModu = False
+                self.listenerKB()
+            else:
+                return self.updateModulation(key_status)
         elif key in self.dic_ascii:
             return self.keyToMidi(key, key_status)
         else:

@@ -32,16 +32,14 @@ class communicateOSC():
         self.port_in = port_in
         self.port_out = port_out
 
+        self.controller.setIpPort(ip,port_out)
         # setting the object which sents messages out
         self.client_out = SimpleUDPClient(self.ip, self.port_out)
-        
-        # starting the server to keep listening for messages
-        # self.client_in = OSCUDPServer((self.ip, self.port_in), self.configureDispatcher())
-        # self.client_in.serve_forever()  # Blocks forever
+ 
 
         # trying an async server
         self.client_in = AsyncIOOSCUDPServer((self.ip, self.port_in), self.configureDispatcher(), asyncio.get_event_loop())
-        self.transport, protocol = await self.client_in.create_serve_endpoint()  # Create datagram endpoint and start serving
+        self.transport, _ = await self.client_in.create_serve_endpoint()  # Create datagram endpoint and start serving
 
         return self
 
@@ -113,6 +111,6 @@ async def init_main():
         await asyncio.sleep(1)
 
     keyboard1.closeNetwork()  # Clean up serve endpoint
-    keyboard1.closeNetwork()  # Clean up serve endpoint
+    keyboard2.closeNetwork()  # Clean up serve endpoint
 
 asyncio.run(init_main())
