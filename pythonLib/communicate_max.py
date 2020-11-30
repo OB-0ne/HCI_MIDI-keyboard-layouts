@@ -1,78 +1,101 @@
 from pythonosc.udp_client import SimpleUDPClient
 from pythonosc.dispatcher import Dispatcher
-from pythonosc.osc_server import OSCUDPServer
+from pythonosc.osc_server import OSCUDPServer, AsyncIOOSCUDPServer
+import asyncio
 
 import time
 import random
 import mido
 from midikeyboard import midiKeyboard
 
-def default_handler(address, *args):
-    print(f"Unknown Input - {address}: {args}")
+class communicateOSC():
 
-def set_keyMappings(address, *args):
-    if address.split('/')[-1] == 'keyboard':
-        out = keyboard1.setNotesKeys(args[0])
-        client_out.send_message("/outputs/key_mappings_spaced", out)
-    elif address.split('/')[-1] == 'octave':
-        out = keyboard1.setOctaveKey(args[0])
-        client_out.send_message("/outputs/transpose", out)
-    elif address.split('/')[-1] == 'transpose':
-        out = keyboard1.setTransposeKey(args[0])
-        client_out.send_message("/outputs/octave", out)
-    elif address.split('/')[-1] == 'pitch_bend':
-        keyboard1.setPitchKey(args[0])
-    elif address.split('/')[-1] == 'modulation':
-        keyboard1.setModulationKey(args[0])
+    controller = None
+    ip = "127.0.0.1"
+    port_in = 6450
+    port_out = 6451
 
-def keyOn(address, *args):
-    # make the MIDI output to be sent
-    out = keyboard1.checkKeyAndCallFunction(args[0], second_key=args[1], key_status='on')
-    # send the MIDI output
-    if out:
-        if len(out)>1:
-            client_out.send_message("/outputs/" + out[0], out[1])
+    client_in = None
+    client_out = None
+
+    def __init__(self, ip, port_in, port_out):
+        # setup the needed keyboards
+        self.controller = midiKeyboard()
+
+        # setting the IP to localhost
+        self.ip = ip
+
+        # setting the in and out port
+        self.port_in = port_in
+        self.port_out = port_out
+
+        # configure the Network for the current settings
+        self.configureNetwork()
+
+    def configureNetwork(self):
+
+        # setting the object which sents messages out
+        self.client_out = SimpleUDPClient(self.ip, self.port_out)
+        
+        # starting the server to keep listening for messages
+        self.client_in = OSCUDPServer((self.ip, self.port_in), self.configureDispatcher())
+        self.client_in.serve_forever()  # Blocks forever
+
+    def configureDispatcher(self):
+        # setting the object which receives the messages and decides where to send them
+        dispatcher = Dispatcher()
+        dispatcher.map("/inputs/key_mapping/*", self.set_keyMappings)
+        dispatcher.map("/inputs/key_on/gen_MIDI", self.set_genMIDI)
+        dispatcher.map("/inputs/key_on", self.keyOn)
+        dispatcher.map("/inputs/key_off", self.keyOff)
+        dispatcher.set_default_handler(self.default_handler)
+
+        return dispatcher
+
+    def default_handler(self,address, *args):
+        print(f"Unknown Input - {address}: {args}")
+
+    def set_keyMappings(self,address, *args):
+        if address.split('/')[-1] == 'keyboard':
+            out = self.controller.setNotesKeys(args[0])
+            self.client_out.send_message("/outputs/key_mappings_spaced", out)
+        elif address.split('/')[-1] == 'octave':
+            out = self.controller.setOctaveKey(args[0])
+            self.client_out.send_message("/outputs/transpose", out)
+        elif address.split('/')[-1] == 'transpose':
+            out = self.controller.setTransposeKey(args[0])
+            self.client_out.send_message("/outputs/octave", out)
+        elif address.split('/')[-1] == 'pitch_bend':
+            self.controller.setPitchKey(args[0])
+        elif address.split('/')[-1] == 'modulation':
+            self.controller.setModulationKey(args[0])
+
+    def keyOn(self,address, *args):
+        # make the MIDI output to be sent
+        out = self.controller.checkKeyAndCallFunction(args[0], second_key=args[1], key_status='on')
+        # send the MIDI output
+        if out:
+            if len(out)>1:
+                self.client_out.send_message("/outputs/" + out[0], out[1])
+            else:
+                self.client_out.send_message("/outputs/key", out[0])
+
+
+    def keyOff(self,address, *args): 
+        # make the MIDI output to be sent
+        out = self.controller.checkKeyAndCallFunction(args[0], second_key=args[1], key_status='off')
+        # send the MIDI output
+        if out:
+            if len(out)>1:
+                self.client_out.send_message("/outputs/" + out[0], out[1])
+            else:
+                self.client_out.send_message("/outputs/key", out[0])
+
+    def set_genMIDI(self,address, *args):
+        if args[0]==1:
+            self.controller.send_genMIDI(ip, port_out)
         else:
-            client_out.send_message("/outputs/key", out[0])
+            self.controller.stop_genMIDI()
 
 
-def keyOff(address, *args): 
-    # make the MIDI output to be sent
-    out = keyboard1.checkKeyAndCallFunction(args[0], second_key=args[1], key_status='off')
-    # send the MIDI output
-    if out:
-        if len(out)>1:
-            client_out.send_message("/outputs/" + out[0], out[1])
-        else:
-            client_out.send_message("/outputs/key", out[0])
-
-def set_genMIDI(address, *args):
-    if args[0]==1:
-        keyboard1.send_genMIDI(ip, port_out)
-    else:
-        keyboard1.stop_genMIDI()
-
-# setup the needed keyboards
-keyboard1 = midiKeyboard()
-
-# setting the IP to localhost
-ip = "127.0.0.1"
-
-# setting the in and out port
-port_in = 6450
-port_out = 6451
-
-# setting the object which sents messages out
-client_out = SimpleUDPClient(ip, port_out)
-
-# setting the object which receives the messages and decides where to send them
-dispatcher = Dispatcher()
-dispatcher.map("/inputs/key_mapping/*", set_keyMappings)
-dispatcher.map("/inputs/key_on/gen_MIDI", set_genMIDI)
-dispatcher.map("/inputs/key_on", keyOn)
-dispatcher.map("/inputs/key_off", keyOff)
-dispatcher.set_default_handler(default_handler)
-
-# starting the server to keep listening for messages
-client_in = OSCUDPServer((ip, port_in), dispatcher)
-client_in.serve_forever()  # Blocks forever
+keyboard1 = communicateOSC('127.0.0.1', 6450, 6451)
