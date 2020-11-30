@@ -61,10 +61,10 @@ class communicateOSC():
             self.client_out.send_message("/outputs/key_mappings_spaced", out)
         elif address.split('/')[-1] == 'octave':
             out = self.controller.setOctaveKey(args[0])
-            self.client_out.send_message("/outputs/transpose", out)
+            self.client_out.send_message("/outputs/octave", out)
         elif address.split('/')[-1] == 'transpose':
             out = self.controller.setTransposeKey(args[0])
-            self.client_out.send_message("/outputs/octave", out)
+            self.client_out.send_message("/outputs/transpose", out)
         elif address.split('/')[-1] == 'pitch_bend':
             self.controller.setPitchKey(args[0])
         elif address.split('/')[-1] == 'modulation':
@@ -93,9 +93,10 @@ class communicateOSC():
 
     def set_genMIDI(self,address, *args):
         if args[0]==1:
-            self.controller.send_genMIDI(ip, port_out)
+            self.controller.send_genMIDI(self.ip, self.port_out)
         else:
             self.controller.stop_genMIDI()
 
 
 keyboard1 = communicateOSC('127.0.0.1', 6450, 6451)
+# keyboard1 = communicateOSC('127.0.0.1', 6460, 6461)
