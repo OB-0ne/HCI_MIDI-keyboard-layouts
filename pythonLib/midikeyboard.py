@@ -79,34 +79,29 @@ class midiKeyboard:
         return ['transpose',self.transpose]
 
     def updatePitch(self, key_status: str) -> int:
-        change = 5
+        change = 0.4
         if key_status == 'on':
             if self.pit>0 and self.pit<127:
                 new = py.position().y
-                diff = self.old- new
-                if diff >0:
-                    self.pit +=change
-                elif diff <0:
-                    self.pit -=change
+                diff = self.old - new
+                self.pit += change*diff
                 self.old = new
         elif key_status == 'off':
             self.pit = 64
+
         return ['pitch_bend',self.pit]
 
     def updateModulation(self,key_status: str) -> int:
-        change = 5
+        change = 1
         if key_status == 'on':
             new = py.position().y
-            diff = self.old- new
-            if diff >0:
-                self.modu +=change
-            elif diff <0:
-                self.modu -=change
+            diff = self.old - new
+            self.modu += change*diff
             self.old = new
-        if self.modu<0:
-            self.modu = 0
-        elif self.modu>127:
-            self.modu = 127
+
+        self.modu = max(self.modu,0)
+        self.modu = min(self.modu,127)
+        
         return ['modulation',self.modu]
 
     #Take an Ascii key as an input and returns the Midi input value.
