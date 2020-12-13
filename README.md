@@ -12,7 +12,7 @@ How to:
 - Run the following file in Max/MSP -> MIDI Controller v0.10
 - Run the following file in Max/MSP (for two handed keyboard kayout) -> 2 MIDI Controllers v0.11
 
-Interacting with application:
+# Interacting with application
 - Have the python communicator running in parallel when interacting with file
 > python pythonLib/communicate_max.py
 - Click 'Set Key Mapping' to map the green colored keys to the piano
