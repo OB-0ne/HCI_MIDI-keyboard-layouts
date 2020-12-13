@@ -1,6 +1,4 @@
 # HCI_MIDI-keyboard-layouts
-
-Here is our demo video: [![Watch the video](https://i.imgur.com/USGuE1h.png)](https://youtu.be/dWTX7w6zmd4)
  
 Get all the supporting libraries. Run the following command:
 > pip3 install -r requirements.txt
@@ -24,3 +22,9 @@ How to:
 - 'Generate MIDI' played a pregenerated midi file, which is generated from a recurrent neural network
 - 'Sustain' will hold the pressed keys for longer and is a toggle on the assigned key
 - Instrumentation can be change by clicking on them
+
+# Demo Video
+
+Here is our demo video: 
+(Unfortunately clicking the video will take you away from GitHub)
+[![Watch the video](https://i.imgur.com/USGuE1h.png)](https://youtu.be/dWTX7w6zmd4)
