@@ -1,4 +1,6 @@
 # HCI_MIDI-keyboard-layouts
+
+Here is our demo video: [![Watch the video](https://i.imgur.com/USGuE1h.png)](https://youtu.be/dWTX7w6zmd4)
  
 Get all the supporting libraries. Run the following command:
 > pip3 install -r requirements.txt
